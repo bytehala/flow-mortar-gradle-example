@@ -23,6 +23,7 @@ import javax.inject.Singleton;
 
 import bytehala.flowmortarexample.GsonParceler;
 import bytehala.flowmortarexample.MainActivity;
+import bytehala.flowmortarexample.android.ActionBarOwner;
 import dagger.Module;
 import dagger.Provides;
 import flow.Parceler;
@@ -31,6 +32,7 @@ import flow.Parceler;
         injects = {
                 MainActivity.class
         },
+        includes = ActionBarOwner.ActionBarModule.class,
         library = true)
 public class RootModule {
 //  @Provides List<Conversation> provideConversations() {

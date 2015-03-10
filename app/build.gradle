@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "bytehala.flowmortarexample"
-        minSdkVersion 10
+        minSdkVersion 15 // Can actually use 10 by not using ActionBarOwner. Just use ToolBar!
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
@@ -29,4 +29,6 @@ dependencies {
     compile 'com.google.code.gson:gson:2.3.1'
     compile 'com.squareup.dagger:dagger:1.2.2'
     provided 'com.squareup.dagger:dagger-compiler:1.2.2'
+    compile 'io.reactivex:rxjava:1.0.8'
+    compile 'io.reactivex:rxandroid:0.24.0'
 }

@@ -1,31 +1,44 @@
 package bytehala.flowmortarexample;
 
+import android.app.ActionBar;
 import android.app.Activity;
-import android.support.v7.app.ActionBarActivity;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 
 import javax.inject.Inject;
 
+import bytehala.flowmortarexample.android.ActionBarOwner;
 import bytehala.flowmortarexample.screen.MainScreen;
 import flow.ActivityFlowSupport;
 import flow.Backstack;
 import flow.Flow;
+import flow.HasParent;
 import flow.Parceler;
 import flow.Path;
 import flow.PathContainerView;
 import mortar.MortarScope;
+import mortar.MortarScopeDevHelper;
 import mortar.bundler.BundleServiceRunner;
 import mortar.dagger1support.ObjectGraphService;
+import rx.functions.Action0;
 
+import static android.view.MenuItem.SHOW_AS_ACTION_ALWAYS;
 import static mortar.bundler.BundleServiceRunner.getBundleServiceRunner;
 
 
-public class MainActivity extends Activity implements Flow.Dispatcher{
+public class MainActivity extends Activity implements Flow.Dispatcher, ActionBarOwner.Activity {
 
     @Inject
     Parceler parceler;
+
+    private ActionBarOwner.MenuAction actionBarMenuAction;
+    @Inject
+    ActionBarOwner actionBarOwner;
 
     private MortarScope activityScope;
     private PathContainerView container;
@@ -39,7 +52,10 @@ public class MainActivity extends Activity implements Flow.Dispatcher{
         ObjectGraphService.inject(this, this);
         setupFlowSupport(savedInstanceState);
 
+
         setContentView(R.layout.activity_main);
+
+        actionBarOwner.takeView(this);
         container = (PathContainerView) findViewById(R.id.container);
     }
 
@@ -51,7 +67,8 @@ public class MainActivity extends Activity implements Flow.Dispatcher{
                 ActivityFlowSupport.onCreate(nonConfig, savedInstanceState, parceler, defaultBackstack);
     }
 
-    @Override public Object getSystemService(String name) {
+    @Override
+    public Object getSystemService(String name) {
         Object service = null;
         if (flowSupport != null) {
             service = flowSupport.getSystemService(name);
@@ -75,25 +92,48 @@ public class MainActivity extends Activity implements Flow.Dispatcher{
     }
 
     @SuppressWarnings("deprecation") // https://code.google.com/p/android/issues/detail?id=151346
-    @Override public Object onRetainNonConfigurationInstance() {
+    @Override
+    public Object onRetainNonConfigurationInstance() {
         return flowSupport.onRetainNonConfigurationInstance();
     }
 
-    @Override protected void onResume() {
+    @Override
+    protected void onResume() {
         super.onResume();
         flowSupport.onResume(this);
     }
 
-    @Override protected void onPause() {
+    @Override
+    protected void onPause() {
         flowSupport.onPause();
         super.onPause();
     }
 
 
+    /**
+     * Configure the action bar menu as required by {@link ActionBarOwner.Activity}.
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        if (actionBarMenuAction != null) {
+            menu.add(actionBarMenuAction.title)
+                    .setShowAsActionFlags(SHOW_AS_ACTION_ALWAYS)
+                    .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem menuItem) {
+                            actionBarMenuAction.action.call();
+                            return true;
+                        }
+                    });
+        }
+        menu.add("Log Scope Hierarchy")
+                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        Log.d("DemoActivity", MortarScopeDevHelper.scopeHierarchyToString(activityScope));
+                        return true;
+                    }
+                });
         return true;
     }
 
@@ -113,17 +153,64 @@ public class MainActivity extends Activity implements Flow.Dispatcher{
     }
 
     @Override
-    public void dispatch(Flow.Traversal traversal, final Flow.TraversalCallback callback) {
-        Path path = traversal.destination.current();
-        setTitle(path.getClass().getSimpleName());
-//        boolean canGoBack = traversal.destination.size() > 1;
-//        actionBar.setDisplayHomeAsUpEnabled(canGoBack);
-//        actionBar.setHomeButtonEnabled(canGoBack);
-        container.dispatch(traversal, new Flow.TraversalCallback() {
-            @Override public void onTraversalCompleted() {
-//                invalidateOptionsMenu();
-                callback.onTraversalCompleted();
-            }
-        });
+    protected void onDestroy() {
+        actionBarOwner.dropView(this);
+
+        // activityScope may be null in case isWrongInstance() returned true in onCreate()
+        if (isFinishing() && activityScope != null) {
+            activityScope.destroy();
+            activityScope = null;
+        }
+
+        super.onDestroy();
     }
+
+    @Override
+    public void dispatch(Flow.Traversal traversal, final Flow.TraversalCallback callback) {
+        Path newScreen = traversal.destination.current();
+        boolean hasUp = newScreen instanceof HasParent;
+        String title = newScreen.getClass().getSimpleName();
+        ActionBarOwner.MenuAction menu =
+                hasUp ? null : new ActionBarOwner.MenuAction("Friends", new Action0() {
+                    @Override public void call() {
+//                        flow.goTo(new FriendListScreen());
+                    }
+                });
+        actionBarOwner.setConfig(new ActionBarOwner.Config(false, hasUp, title, menu));
+
+        container.dispatch(traversal, callback);
+    }
+
+
+    @Override
+    public void setShowHomeEnabled(boolean enabled) {
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null)
+            actionBar.setDisplayShowHomeEnabled(false);
+    }
+
+    @Override
+    public void setUpButtonEnabled(boolean enabled) {
+        ActionBar actionBar = getActionBar();
+
+        if (actionBar != null) {
+
+            actionBar.setDisplayHomeAsUpEnabled(enabled);
+            actionBar.setHomeButtonEnabled(enabled);
+        }
+    }
+
+    @Override
+    public void setMenu(ActionBarOwner.MenuAction action) {
+        if (action != actionBarMenuAction) {
+            actionBarMenuAction = action;
+            invalidateOptionsMenu();
+        }
+    }
+
+    @Override
+    public Context getContext() {
+        return this;
+    }
+
 }
