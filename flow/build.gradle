@@ -1,0 +1,23 @@
+import com.android.builder.core.BuilderConstants;
+
+buildscript {
+  dependencies {
+    classpath 'com.android.tools.build:gradle:1.1.0'
+  }
+}
+
+apply plugin: 'com.android.library'
+android {
+  compileSdkVersion 21
+  buildToolsVersion "21.1.2"
+
+  defaultConfig {
+  minSdkVersion 10
+    versionName "0.8"
+  }
+}
+
+dependencies {
+  testCompile 'junit:junit:4.10'
+  testCompile 'org.easytesting:fest-assert-core:2.0M10'
+}

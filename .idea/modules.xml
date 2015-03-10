@@ -4,6 +4,9 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/FlowMortarExample.iml" filepath="$PROJECT_DIR$/FlowMortarExample.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dagger1support/dagger1support.iml" filepath="$PROJECT_DIR$/dagger1support/dagger1support.iml" />
+      <module fileurl="file://$PROJECT_DIR$/flow/flow.iml" filepath="$PROJECT_DIR$/flow/flow.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mortar/mortar.iml" filepath="$PROJECT_DIR$/mortar/mortar.iml" />
     </modules>
   </component>
 </project>

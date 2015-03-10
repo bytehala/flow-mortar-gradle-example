@@ -1,0 +1,18 @@
+buildscript {
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.1.0'
+    }
+}
+apply plugin: 'com.android.library'
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        minSdkVersion 10
+    }
+}
+dependencies {
+    compile 'com.squareup.dagger:dagger:1.2.2'
+    compile project(':mortar')
+}
