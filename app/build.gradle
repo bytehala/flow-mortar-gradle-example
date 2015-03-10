@@ -25,4 +25,8 @@ dependencies {
     compile project(':dagger1support')
     compile project(':flow')
     compile project(':mortar')
+    compile 'com.nineoldandroids:library:2.4.0'
+    compile 'com.google.code.gson:gson:2.3.1'
+    compile 'com.squareup.dagger:dagger:1.2.2'
+    provided 'com.squareup.dagger:dagger-compiler:1.2.2'
 }

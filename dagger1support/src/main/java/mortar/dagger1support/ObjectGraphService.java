@@ -4,8 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import dagger.ObjectGraph;
 import java.util.Collection;
-import com.squareup.mortar.MortarScope;
-import com.squareup.mortar.bundler.BundleServiceRunner;
+import mortar.MortarScope;
+import mortar.bundler.BundleServiceRunner;
 
 /**
  * Provides utility methods for using Mortar with Dagger 1.
@@ -67,7 +67,7 @@ public class ObjectGraphService {
   /**
    * Returns the existing {@link MortarScope} scope for the given {@link Activity}, or
    * uses the {@link mortar.dagger1support.Blueprint} to create one if none is found. The scope will provide
-   * {@link com.squareup.mortar.bundler.BundleService} and {@link BundleServiceRunner}.
+   * {@link mortar.bundler.BundleService} and {@link BundleServiceRunner}.
    * <p/>
    * It is expected that this method will be called from {@link Activity#onCreate}. Calling
    * it at other times may lead to surprises.
