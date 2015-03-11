@@ -13,6 +13,7 @@ import android.view.Window;
 import javax.inject.Inject;
 
 import bytehala.flowmortarexample.android.ActionBarOwner;
+import bytehala.flowmortarexample.pathview.HandlesBack;
 import bytehala.flowmortarexample.screen.ChatListScreen;
 import bytehala.flowmortarexample.screen.FriendListScreen;
 import bytehala.flowmortarexample.screen.MainScreen;
@@ -45,6 +46,7 @@ public class MainActivity extends Activity implements Flow.Dispatcher, ActionBar
     private MortarScope activityScope;
     private PathContainerView container;
     private ActivityFlowSupport flowSupport;
+    private HandlesBack containerAsHandlesBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +61,7 @@ public class MainActivity extends Activity implements Flow.Dispatcher, ActionBar
 
         actionBarOwner.takeView(this);
         container = (PathContainerView) findViewById(R.id.container);
+        containerAsHandlesBack = (HandlesBack) container;
     }
 
     private void setupFlowSupport(Bundle savedInstanceState) {
@@ -139,19 +142,18 @@ public class MainActivity extends Activity implements Flow.Dispatcher, ActionBar
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+    /** Inform the view about up events. */
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
+    }
+
+    /** Inform the view about back events. */
+    @Override public void onBackPressed() {
+        if (!containerAsHandlesBack.onBackPressed()) super.onBackPressed();
     }
 
     @Override
