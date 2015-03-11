@@ -13,6 +13,8 @@ import android.view.Window;
 import javax.inject.Inject;
 
 import bytehala.flowmortarexample.android.ActionBarOwner;
+import bytehala.flowmortarexample.screen.ChatListScreen;
+import bytehala.flowmortarexample.screen.FriendListScreen;
 import bytehala.flowmortarexample.screen.MainScreen;
 import flow.ActivityFlowSupport;
 import flow.Backstack;
@@ -60,7 +62,7 @@ public class MainActivity extends Activity implements Flow.Dispatcher, ActionBar
     }
 
     private void setupFlowSupport(Bundle savedInstanceState) {
-        Backstack defaultBackstack = Backstack.single(new MainScreen());
+        Backstack defaultBackstack = Backstack.single(new ChatListScreen());
         @SuppressWarnings("deprecation") ActivityFlowSupport.NonConfigurationInstance nonConfig =
                 (ActivityFlowSupport.NonConfigurationInstance) getLastNonConfigurationInstance();
         flowSupport =
@@ -173,7 +175,7 @@ public class MainActivity extends Activity implements Flow.Dispatcher, ActionBar
         ActionBarOwner.MenuAction menu =
                 hasUp ? null : new ActionBarOwner.MenuAction("Friends", new Action0() {
                     @Override public void call() {
-//                        flow.goTo(new FriendListScreen());
+                        Flow.get(MainActivity.this).goTo(new FriendListScreen());
                     }
                 });
         actionBarOwner.setConfig(new ActionBarOwner.Config(false, hasUp, title, menu));

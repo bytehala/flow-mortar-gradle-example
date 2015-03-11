@@ -24,24 +24,21 @@ import javax.inject.Singleton;
 import bytehala.flowmortarexample.GsonParceler;
 import bytehala.flowmortarexample.MainActivity;
 import bytehala.flowmortarexample.android.ActionBarOwner;
+import bytehala.flowmortarexample.model.Chats;
+import bytehala.flowmortarexample.model.QuoteService;
 import dagger.Module;
 import dagger.Provides;
 import flow.Parceler;
+import retrofit.RestAdapter;
+import retrofit.converter.GsonConverter;
 
 @Module(
         injects = {
                 MainActivity.class
         },
-        includes = ActionBarOwner.ActionBarModule.class,
+        includes = { ActionBarOwner.ActionBarModule.class, Chats.Module.class },
         library = true)
 public class RootModule {
-//  @Provides List<Conversation> provideConversations() {
-//    return SampleData.CONVERSATIONS;
-//  }
-
-//  @Provides List<User> provideFriends() {
-//    return SampleData.FRIENDS;
-//  }
 
     @Provides
     @Singleton
@@ -53,5 +50,13 @@ public class RootModule {
     @Singleton
     Parceler provideParcer(Gson gson) {
         return new GsonParceler(gson);
+    }
+
+    @Provides @Singleton QuoteService provideQuoteService() {
+        RestAdapter restAdapter =
+                new RestAdapter.Builder().setEndpoint("http://www.iheartquotes.com/api/v1/")
+                        .setConverter(new GsonConverter(new Gson()))
+                        .build();
+        return restAdapter.create(QuoteService.class);
     }
 }
