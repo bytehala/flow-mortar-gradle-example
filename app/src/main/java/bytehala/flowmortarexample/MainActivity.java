@@ -78,7 +78,7 @@ public class MainActivity extends Activity implements Flow.Dispatcher, ActionBar
         if (flowSupport != null) {
             service = flowSupport.getSystemService(name);
         }
-        MortarScope activityScope = MortarScope.findChild(getApplicationContext(), getScopeName());
+        activityScope = MortarScope.findChild(getApplicationContext(), getScopeName());
 
         if (activityScope == null) {
             activityScope = MortarScope.buildChild(getApplicationContext(), getScopeName()) //
