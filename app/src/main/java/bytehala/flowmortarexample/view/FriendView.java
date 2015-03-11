@@ -18,21 +18,31 @@ package bytehala.flowmortarexample.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import bytehala.flowmortarexample.R;
 import bytehala.flowmortarexample.screen.FriendScreen;
 import mortar.dagger1support.ObjectGraphService;
 import javax.inject.Inject;
 
-public class FriendView extends TextView  {
+public class FriendView extends FrameLayout {
   @Inject FriendScreen.Presenter presenter;
+
+    private TextView friendName;
 
   public FriendView(Context context, AttributeSet attrs) {
     super(context, attrs);
     ObjectGraphService.inject(context, this);
   }
 
-  @Override protected void onAttachedToWindow() {
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        friendName = (TextView) findViewById(R.id.friend_info);
+    }
+
+    @Override protected void onAttachedToWindow() {
     super.onAttachedToWindow();
     presenter.takeView(this);
   }
@@ -41,4 +51,8 @@ public class FriendView extends TextView  {
     super.onDetachedFromWindow();
     presenter.dropView(this);
   }
+
+    public void setText(String name) {
+        friendName.setText("Name: " + name);
+    }
 }
